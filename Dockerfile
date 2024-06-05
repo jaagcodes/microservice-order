@@ -31,4 +31,5 @@ COPY --from=build /app/package*.json ./
 EXPOSE 3002
 
 # Command to run the application
-CMD ["node", "-r", "newrelic", "dist/main"]
+CMD ["node", "dist/main"]
+
