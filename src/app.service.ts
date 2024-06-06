@@ -2,7 +2,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Order } from './entities/orders.entity';
-import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
+import { CreateRequestContext, EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class AppService {
@@ -26,4 +26,15 @@ export class AppService {
 
     return order;
   }
+
+  @CreateRequestContext()
+  async handleOrderCompleted(data: { orderId: string; recipeId: string }) {
+    const order = await this.orderRepository.findOne({ id: data.orderId });
+    if (order) {
+      order.status = 'completed';
+      await this.em.persistAndFlush(order);
+    }
+  }
 }
+
+

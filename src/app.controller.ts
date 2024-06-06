@@ -1,6 +1,7 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Order } from './entities/orders.entity';
+import { EventPattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
@@ -14,5 +15,10 @@ export class AppController {
   @Post()
   async create(): Promise<Order> {
     return this.appService.createOrder();
+  }
+
+  @EventPattern('order_completed')
+  async handleOrderCompleted(data: { orderId: string; recipeId: string }) {
+    await this.appService.handleOrderCompleted(data);
   }
 }
