@@ -1,11 +1,14 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Order } from './entities/orders.entity';
 import { CreateRequestContext, EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class AppService {
+
+  private readonly logger = new Logger(AppService.name);
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: EntityRepository<Order>,

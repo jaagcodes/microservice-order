@@ -1,10 +1,13 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Order } from './entities/orders.entity';
 import { EventPattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
+
+  private readonly logger = new Logger(AppService.name);
+
   constructor(private readonly appService: AppService) {}
 
   @Get()
