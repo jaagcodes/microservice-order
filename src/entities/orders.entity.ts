@@ -12,6 +12,9 @@ export class Order {
   @Property()
   createdAt: Date = new Date();
 
+  @Property({ default: '' })
+  dish: string = '';
+
   @Property({ onUpdate: () => new Date() })
   updatedAt: Date = new Date();
 }

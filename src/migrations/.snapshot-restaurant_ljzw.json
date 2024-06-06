@@ -34,6 +34,16 @@
           "length": 6,
           "mappedType": "datetime"
         },
+        "dish": {
+          "name": "dish",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "''",
+          "mappedType": "string"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamptz",

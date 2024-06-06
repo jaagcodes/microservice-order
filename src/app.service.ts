@@ -28,10 +28,11 @@ export class AppService {
   }
 
   @CreateRequestContext()
-  async handleOrderCompleted(data: { orderId: string; recipeId: string }) {
+  async handleOrderCompleted(data: { orderId: string; recipeId: string; recipeName: string}) {
     const order = await this.orderRepository.findOne({ id: data.orderId });
     if (order) {
       order.status = 'completed';
+      order.dish = data.recipeName;
       await this.em.persistAndFlush(order);
     }
   }

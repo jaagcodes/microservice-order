@@ -18,7 +18,7 @@ export class AppController {
   }
 
   @EventPattern('order_completed')
-  async handleOrderCompleted(data: { orderId: string; recipeId: string }) {
+  async handleOrderCompleted(data: { orderId: string; recipeId: string; recipeName: string }) {
     await this.appService.handleOrderCompleted(data);
   }
 }
