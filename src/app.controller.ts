@@ -2,13 +2,28 @@ import { Controller, Get, Post, Logger, InternalServerErrorException, Query } fr
 import { OrderService } from './services/order.service';
 import { Order } from './entities/orders.entity';
 import { EventPattern } from '@nestjs/microservices';
+import { HealthCheckService } from './services/health-check.service';
 
 @Controller()
 export class AppController {
 
   private readonly logger = new Logger(AppController.name);
 
-  constructor(private readonly orderService: OrderService) { }
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly healthCheckService: HealthCheckService,
+  ) { }
+
+  @Get('health')
+    getHealthStatus(): string {
+      try {
+        this.logger.log('Checking health status');
+        return this.healthCheckService.getHealthStatus();
+      } catch (error) {
+        this.logger.error('Error checking health status', error.stack);
+        throw new InternalServerErrorException('Error checking health status');
+      }
+    }
 
   @Post()
   async create(): Promise<Order> {
