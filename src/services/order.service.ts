@@ -3,6 +3,7 @@ import { Inject, Injectable, InternalServerErrorException, Logger, NotFoundExcep
 import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '../entities/orders.entity';
 import { CreateRequestContext, EntityManager, EntityRepository } from '@mikro-orm/postgresql';
+import { CompleteOrderDto } from '../dtos/complete-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -46,18 +47,18 @@ export class OrderService {
   }
 
   @CreateRequestContext()
-  async handleOrderCompleted(data: { orderId: string; recipeId: string; recipeName: string }) {
+  async handleOrderCompleted(completeOrderDto: CompleteOrderDto) {
     try {
-      this.logger.log(`Handling order completion for order ID ${data.orderId}`);
-      const order = await this.orderRepository.findOne({ id: data.orderId });
+      this.logger.log(`Handling order completion for order ID ${completeOrderDto.orderId}`);
+      const order = await this.orderRepository.findOne({ id: completeOrderDto.orderId });
       if (!order) {
-        this.logger.error(`Order with ID ${data.orderId} not found`);
-        throw new NotFoundException(`Order with ID ${data.orderId} not found`);
+        this.logger.error(`Order with ID ${completeOrderDto.orderId} not found`);
+        throw new NotFoundException(`Order with ID ${completeOrderDto.orderId} not found`);
       }
       order.status = 'completed';
-      order.dish = data.recipeName;
+      order.dish = completeOrderDto.recipeName;
       await this.em.persistAndFlush(order);
-      this.logger.log(`Order with ID ${data.orderId} marked as completed`);
+      this.logger.log(`Order with ID ${completeOrderDto.orderId} marked as completed`);
     } catch (error) {
       this.logger.error('Error handling order completion', error.stack);
       throw new InternalServerErrorException('Error handling order completion');

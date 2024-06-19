@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Logger, InternalServerErrorException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Logger, InternalServerErrorException, Query, Body } from '@nestjs/common';
 import { OrderService } from './services/order.service';
 import { Order } from './entities/orders.entity';
 import { EventPattern } from '@nestjs/microservices';
 import { HealthCheckService } from './services/health-check.service';
+import { FindOrdersDto } from './dtos/find-order.dto';
+import { CompleteOrderDto } from './dtos/complete-order.dto';
 
 @Controller()
 export class AppController {
@@ -39,13 +41,10 @@ export class AppController {
   }
 
   @Get('orders')
-  async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<{ data: Order[], total: number }> {
+  async findAll(@Query() findOrdersDto: FindOrdersDto): Promise<{ data: Order[], total: number }> {
     try {
       this.logger.log('Received request to fetch all orders');
-      return await this.orderService.findAllOrders(page, limit);
+      return await this.orderService.findAllOrders(findOrdersDto.page, findOrdersDto.limit);
     } catch (error) {
       this.logger.error('Error fetching all orders', error.stack);
       throw new InternalServerErrorException('Error fetching all orders');
@@ -53,11 +52,11 @@ export class AppController {
   }
 
   @EventPattern('order_completed')
-  async handleOrderCompleted(data: { orderId: string; recipeId: string; recipeName: string }) {
+  async handleOrderCompleted(@Body() completeOrderDto: CompleteOrderDto) {
     try {
-      this.logger.log(`Received order completion event for order ID ${data.orderId}`);
-      await this.orderService.handleOrderCompleted(data);
-      this.logger.log(`Order completion handled for order ID ${data.orderId}`);
+      this.logger.log(`Received order completion event for order ID ${completeOrderDto.orderId}`);
+      await this.orderService.handleOrderCompleted(completeOrderDto);
+      this.logger.log(`Order completion handled for order ID ${completeOrderDto.orderId}`);
     } catch (error) {
       this.logger.error('Error handling order completion', error.stack);
       throw error;
