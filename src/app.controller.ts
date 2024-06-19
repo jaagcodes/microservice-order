@@ -5,7 +5,9 @@ import { EventPattern } from '@nestjs/microservices';
 import { HealthCheckService } from './services/health-check.service';
 import { PaginationQueryDto } from './dtos/pagination-query.dto';
 import { CompleteOrderDto } from './dtos/complete-order.dto';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('orders')
 @Controller()
 export class AppController {
 
@@ -16,6 +18,8 @@ export class AppController {
     private readonly healthCheckService: HealthCheckService,
   ) { }
 
+  @ApiOperation({ summary: 'Get health status' })
+  @ApiResponse({ status: 200, description: 'The health status of the application' })
   @Get('health')
     getHealthStatus(): string {
       try {
@@ -27,6 +31,8 @@ export class AppController {
       }
     }
 
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({ status: 201, description: 'The order has been successfully created.' })
   @Post()
   async create(): Promise<Order> {
     try {
@@ -40,6 +46,10 @@ export class AppController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiResponse({ status: 200, description: 'Fetched all orders successfully.' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of orders per page' })
   @Get('orders')
   async findAll(@Query() paginationQueryDto: PaginationQueryDto): Promise<{ data: Order[], total: number }> {
     try {
@@ -51,6 +61,7 @@ export class AppController {
     }
   }
 
+  @ApiOperation({ summary: 'Handle order completion' })
   @EventPattern('order_completed')
   async handleOrderCompleted(@Body() completeOrderDto: CompleteOrderDto) {
     try {
