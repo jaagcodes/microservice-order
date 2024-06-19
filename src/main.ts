@@ -19,11 +19,10 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>(redisConfig);
 
   await app.startAllMicroservices();
+  app.useGlobalPipes(new ValidationPipe());
 
   const port = configService.get<number>('PORT') || 3002;
+  
   await app.listen(port);
-
-  app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
 }
 bootstrap();
