@@ -3,7 +3,7 @@ import { OrderService } from './services/order.service';
 import { Order } from './entities/orders.entity';
 import { EventPattern } from '@nestjs/microservices';
 import { HealthCheckService } from './services/health-check.service';
-import { FindOrdersDto } from './dtos/find-order.dto';
+import { PaginationQueryDto } from './dtos/pagination-query.dto';
 import { CompleteOrderDto } from './dtos/complete-order.dto';
 
 @Controller()
@@ -41,10 +41,10 @@ export class AppController {
   }
 
   @Get('orders')
-  async findAll(@Query() findOrdersDto: FindOrdersDto): Promise<{ data: Order[], total: number }> {
+  async findAll(@Query() paginationQueryDto: PaginationQueryDto): Promise<{ data: Order[], total: number }> {
     try {
       this.logger.log('Received request to fetch all orders');
-      return await this.orderService.findAllOrders(findOrdersDto.page, findOrdersDto.limit);
+      return await this.orderService.findAllOrders(paginationQueryDto.page, paginationQueryDto.limit);
     } catch (error) {
       this.logger.error('Error fetching all orders', error.stack);
       throw new InternalServerErrorException('Error fetching all orders');
