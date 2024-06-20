@@ -4,11 +4,13 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '../entities/orders.entity';
 import { CreateRequestContext, EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { CompleteOrderDto } from '../dtos/complete-order.dto';
+import { CustomLogger } from 'src/common/utils/logger.util';
+import { EntityNotFoundException } from 'src/common/exceptions/not-found.exception';
 
 @Injectable()
 export class OrderService {
 
-  private readonly logger = new Logger(OrderService.name);
+  private readonly logger = CustomLogger.getInstance(OrderService.name);
 
   constructor(
     @InjectRepository(Order)
@@ -27,7 +29,7 @@ export class OrderService {
       this.logger.log(`Order created with ID ${order.id}`);
       return order;
     } catch (error) {
-      this.logger.log('Error creating order ', error.stack);
+      this.logger.error('Error creating order ', error.stack);
       throw new InternalServerErrorException('Error creating order');
     }
   }
@@ -52,8 +54,7 @@ export class OrderService {
       this.logger.log(`Handling order completion for order ID ${completeOrderDto.orderId}`);
       const order = await this.orderRepository.findOne({ id: completeOrderDto.orderId });
       if (!order) {
-        this.logger.error(`Order with ID ${completeOrderDto.orderId} not found`);
-        throw new NotFoundException(`Order with ID ${completeOrderDto.orderId} not found`);
+        throw new EntityNotFoundException('Order', completeOrderDto.orderId);
       }
       order.status = 'completed';
       order.dish = completeOrderDto.recipeName;

@@ -6,12 +6,13 @@ import { HealthCheckService } from './services/health-check.service';
 import { PaginationQueryDto } from './dtos/pagination-query.dto';
 import { CompleteOrderDto } from './dtos/complete-order.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CustomLogger } from './common/utils/logger.util';
 
 @ApiTags('orders')
 @Controller()
 export class AppController {
 
-  private readonly logger = new Logger(AppController.name);
+  private readonly logger = CustomLogger.getInstance(AppController.name);
 
   constructor(
     private readonly orderService: OrderService,
